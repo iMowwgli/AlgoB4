@@ -236,28 +236,53 @@ def maxBST(B):
 
 #Écrire la fonction average_balances (B) qui calcule la moyenne des déséquilibres de tous les nœuds
 #de l'arbre binaire (class BinTree) B. Si l'arbre est vide la fonction retourne 0.
+def total_balances(B):
+    """Calcule la somme de toutes les balances présentes dans l'arbre."""
+    res = 0
+    if B != None:
+        # On utilise directement l'attribut .bal existant
+        res = B.bal + total_balances(B.left) + total_balances(B.right)
+    return res
+
+def total_nodes(B):
+    """Compte le nombre total de nœuds de l'arbre."""
+    res = 0
+    if B != None:
+        res = 1 + total_nodes(B.left) + total_nodes(B.right)
+    return res
 
 def average_balances(B):
-    if B == None:
-        return 0
-    else:
-        totbal = total_balances(B)
-        totnode = total_nodes(B)
-        return totbal / totnode
-    
-def total_balances(B):
-    if B == None:
-        return 0
-    else:
-        bal_l = total_balances(B.left)
-        bal_r = total_balances(B.right)
-        return B.left.bal + B.right.bal + bal_l + bal_r
-    
-def total_nodes(B):
-    if B == None:
-        return 0
-    else:
-        node_l = total_nodes(B.left)
-        node_r = total_nodes(B.right)
-        return 1 + node_l + node_r
+    """Retourne la moyenne des balances, ou 0 si l'arbre est vide."""
+    res = 0
+    if B != None:
+        tot_bal = total_balances(B)
+        tot_nodes = total_nodes(B)
+        res = tot_bal / tot_nodes
+    return res
 
+
+def heap_push(H, val):
+    H.append(val)
+    i = len(H) - 1
+    # Tant qu'on n'est pas à la racine et que le fils < père
+    while i > 1 and H[i] < H[i // 2]:
+        H[i], H[i // 2] = H[i // 2], H[i]
+        i = i // 2
+
+def heap_pop(H):
+    if len(H) <= 1:
+        return None
+    res = H[1]
+    H[1] = H[-1]
+    H.pop()
+    n = len(H) - 1
+    i = 1
+    while 2 * i <= n: # Tant qu'il y a au moins un fils
+        j = 2 * i # Fils gauche
+        if j < n and H[j+1] < H[j]: # Si fils droit existe et est plus petit
+            j = j + 1
+        if H[i] <= H[j]: # Si l'ordre est respecté
+            break
+        H[i], H[j] = H[j], H[i]
+        i = j
+    return res
