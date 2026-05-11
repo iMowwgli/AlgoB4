@@ -296,7 +296,7 @@ def lr(A): # left rotation
     A: AVL
     applies a left rotation on A and returns the new root of the AVL
     '''
-    aux = A.right
+    aux = A.right 
     A.right = aux.left
     aux.left = A
     aux.bal += 1
@@ -528,35 +528,37 @@ def heap_sort(L):
         :param L: a list containing pairs (element: any, value: int)
         :rtype: (any, num) list (the new list sorted)
     """
-    H = [None]
-    for (v, e) in L:
-        heap_push(H, v, e)
+    H = [None] # on laisse la position 0 du tas vide pour simplifier les calculs d'indices
+    for (v, e) in L: #attention : (v, e) et pas (e, v) pour respecter l'ordre de tri demandé
+        heap_push(H, v, e) 
     L = []
-    while H != [None]:
-        (v, e) = heap_pop(H)
-        L.append((v, e))
-    return L
+    while H != [None]: # tant que le tas n'est pas vide
+        (v, e) = heap_pop(H) # on récupère le minimum (v, e) du tas
+        L.append((v, e)) # on ajoute ce minimum à la liste résultat
+    return L # la liste L est triée à la fin de l'algorithme
 
-def heapify(H):
-    """ makes H a heap (in place) - returns H modified
-    
-      :param H: list (a complete tree)
-      :rtype: list (a heap)
-    """    
-    n = len(H)
-    cur = (n-1)//2
-    while cur >= 0:
-        n = len(H)
-        i = cur
-        val, el = H[i]
-        while 2*i+1 < n:
-            m = 2*i+1
-            if m+1 < n and H[m+1][0] < H[m][0]:
-                m = m+1
-            if H[m][0] < val:
-                H[i] = H[m]
-                i = m
-            else:
-                n = -1
-        H[i] = val, el
-        cur = cur - 1
+
+
+
+def total_balances(B):
+    res = 0
+    if B != None:
+        # On additionne la balance actuelle et les totaux des fils
+        res = B.bal + total_balances(B.left) + total_balances(B.right)
+    return res
+
+
+def total_nodes(B):
+    res = 0
+    if B != None:
+        res = 1 + total_nodes(B.left) + total_nodes(B.right)
+    return res
+
+
+def average_balances(B):
+    res = 0
+    if B != None:
+        tot_bal = total_balances(B)
+        tot_nodes = total_nodes(B)
+        res = tot_bal / tot_nodes
+    return res
