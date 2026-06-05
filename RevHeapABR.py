@@ -562,3 +562,137 @@ def average_balances(B):
         tot_nodes = total_nodes(B)
         res = tot_bal / tot_nodes
     return res
+
+#return True s'il n'existe aucune sequence de nœuds de B dont les clés sont toutes strictement supérieures à k, False sinon.
+def positive_sequence(B,k):
+    if B == None:
+        return False
+    if B.key > k:
+        return True
+    else:
+        resg = positive_sequence(B.left, k) 
+        resd = positive_sequence(B.right, k)
+        return resg or resd
+    
+
+
+
+def sequence(B, k):
+    f = False
+    if B != None:
+        if B.key > k:
+            f = True
+        else:
+            if sequence(B.left, k) == True:
+                f = True
+            else:
+                if sequence(B.right, k) == True:
+                    f = True
+    return f
+
+def positive_sequence(B, k):
+    res = True
+    if sequence(B, k) == True:
+        res = False
+    return res
+
+#compte le nombre par étage de valeur en dessous de n, 
+#renvoie une liste de int avec le nombre de noueud en dessous de n pour chaque étage de l'arbre B.
+
+def etage(B,n):
+    if B == None:
+        return []
+    else:
+        res = []
+        q = Queue()
+        q.enqueue(B)
+
+        while not q.isempty():
+            qnext = Queue()
+            cmpt_lvl = 0
+            
+            while not qnext.isempty():
+                x = q.dequeue()
+                
+                if x.key < n:
+                    cmpt_lvl += 1
+                    
+                if x.left != None:
+                    qnext.enqueue(x.left)
+                if x.right != None:
+                    qnext.enqueue(x.right)
+            
+            res.append(cmpt_lvl)
+            
+            q = qnext
+            
+    return res
+
+
+def list_sum_limit(B, limit):
+    if B is None:
+        return []
+
+    q = Queue()
+    q.enqueue(B)
+    res = []
+
+    while not q.isempty() and limit > 0:
+        qnext = Queue()
+        level_sum = 0
+
+        while not q.isempty():
+            x = q.dequeue()
+
+            if x.key > limit:
+                return res
+
+            limit -= x.key
+            level_sum += x.key
+
+            if x.left is not None:
+                qnext.enqueue(x.left)
+            if x.right is not None:
+                qnext.enqueue(x.right)
+
+        res.append(level_sum)
+        q = qnext
+
+    return res
+
+
+def count_level(B):
+    if B == None:
+        return []
+    else:
+        q = Queue()
+        q.enqueue(B)
+        res = []
+    
+        while not q.isempty():
+            c_lvl = 0
+            qnext = Queue()
+            while not q.isempty():
+                
+                x = q.dequeue()     
+                c_lvl += 1
+                if x.left != None:
+                    qnext.enqueue(x.left)
+                if x.right != None:
+                    qnext.enqueue(x.right)
+                
+            res.append(c_lvl)
+            q = qnext
+        
+        return res 
+    
+B = BinTree(10,
+        BinTree(5,
+            BinTree(2, None, None),
+            BinTree(3, None, None)),
+        BinTree(7,
+            None,
+            BinTree(1, None, None)))
+
+print(list_sum_limit(B, 15)) # devrait afficher [10] 
+print(count_level(B)) # devrait afficher [1, 2, 3, 3, 4] ou [1, 2, 3, 3, 4] selon l'ordre de parcours des nœuds au même niveau
