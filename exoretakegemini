@@ -591,5 +591,28 @@ def find_level_with_max_nodes(B):
         return best_lvl
 
 
+def count_leaves_with_value(B,target):
+    if B == None:
+        return 0
+    else:
+        occ = 0
+        if B.left == None:
+            if B.right == None:
+                if B.key == target:
+                    return 1
+                else:
+                    return 0
+            else:
+                return count_leaves_with_value(B.right,target)
+        else:
+            if B.right == None: #pt simple gauche
+                return count_leaves_with_value(B.left,target)
+            else: # pt double 
+                resg = count_leaves_with_value(B.left,target)
+                resd = count_leaves_with_value(B.right,target)
+                
+                return count_leaves_with_value(resg + resd)
+
+
         
         
