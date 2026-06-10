@@ -1,0 +1,595 @@
+from collections import deque
+# -*- coding: utf-8 -*-
+"""Binary Tree module"""
+
+class BinTree:
+    """Simple class for binary tree
+
+    Attributes:
+        key (Any): Node key.
+        left (BinTree): Left child.
+        right (BinTree): Right child.
+
+    """
+
+    def __init__(self, key, left, right):
+        """Init binary tree.
+
+        Args:
+            key (Any): Node key.
+            left (BinTree): Left child.
+            right (BinTree): Right child.
+
+        """
+
+        self.key = key
+        self.left = left
+        self.right = right
+
+# -*- coding: utf-8 -*-
+"""Queue module.
+    All operations are in constant time
+"""
+
+class Queue:
+    """Simple class for FIFO (first-in-first-out) container."""
+
+    def __init__(self):
+        """Init queue."""
+
+        self.elements = deque()
+
+    def enqueue(self, elt):
+        """Add an element to the queue.
+
+        Args:
+            elt (Any): Element to enqueue.
+
+        """
+
+        self.elements.append(elt)
+
+    def dequeue(self):
+        """Remove and return next element from the queue.
+
+        Returns:
+            Any: Element from the queue.
+
+        Raises:
+            IndexError: If queue is empty.
+
+        """
+
+        return self.elements.popleft()
+
+    def isempty(self):
+        """Check whether queue is empty.
+
+        Returns:
+            bool: True if queue is empty, False otherwise.
+
+        """
+
+        return len(self.elements) == 0
+    
+
+    # -*- coding: utf-8 -*-
+
+"""
+AVL Module
+"""
+
+class AVL:
+    """AVL main class."""
+    def __init__(self, key, left, right, bal):
+        self.key = key
+        self.left = left
+        self.right = right
+        self.bal = bal
+
+
+#######################################################################
+
+
+'''1. Profondeur — D1 : size(B)
+Le but est de compter le nombre total de nœuds dans l'arbre.'''
+
+def size(B):
+    if B == None:
+        return 0
+    else:
+        return 1 + size(B.left) + size(B.right)
+    
+def largeur(B):
+    if B == None:
+        return []
+    else:
+        q = Queue()
+        q.enqueue(B)
+        res = []
+        while not q.isempty():
+            
+            x = q.dequeue()
+
+            res.append(x.key)
+            
+            if x.left != None:
+                q.enqueue(x.left)
+            if x.right != None:
+                q.enqueue(x.right)
+        
+    return res 
+
+def hauteur(B):
+    if B == None:
+        return -1
+    else:
+        return 1 + max(hauteur(B.left),hauteur(B.right)) 
+
+
+def size_bfs(B):
+    if B == None:
+        return 0
+    else:
+        q = Queue()
+        q.enqueue(B)
+        res = 0
+
+        while not q.isempty():
+
+            x = q.dequeue()
+            res += 1
+
+            if x.left != None:
+                q.enqueue(x.left)
+            if x.right != None:
+                q.enqueue(x.right)
+        
+    return res 
+
+'''D3 : Les 3 ordres (Préfixe, Infixe, Suffixe)
+
+Écris 3 fonctions séparées qui affichent (ou retournent une liste) des clés. 
+Le secret réside uniquement dans la place du print(B.key) ou de 
+l'ajout par rapport aux deux appels récursifs
+
+'''
+
+def prefixe(B):
+    if B == None:
+        return []
+    return [B.key] + prefixe(B.left) + prefixe(B.right)
+
+def infixe(B):
+    if B == None:
+        return []
+    return infixe(B.left) + [B.key] + infixe(B.right)
+
+def suffixe(B):
+    if B == None:
+        return []
+    return suffixe(B.left) + suffixe(B.right) + [B.key]
+
+'''B3 object_to_list(B)
+Pour cet exercice, on veut transformer l'arbre en une liste où chaque élément est placé à son indice hiérarchique.'''
+
+
+def object_to_list(B):
+    if B == None:
+        return []
+    
+    q = Queue()
+    # On enfile le premier couple : (le nœud de la racine, son index qui est 1)
+    q.enqueue((B, 1)) 
+    
+    # On initialise notre liste de résultat avec une taille de départ
+    res = [None] * 2 
+    
+    while not q.isempty():
+        # On extrait le couple
+        current, idx = q.dequeue()
+        
+        # 1. Si 'idx' est plus grand que la taille de 'res', 
+        #    il faut agrandir 'res' avec des [None]
+        if idx >= len(res):
+            res = res + [None] * (idx - len(res) + 1)
+            
+        # 2. On place la clé du nœud au bon endroit
+        res[idx] = current.key
+        
+        # 3. On enfile les fils avec leurs indices hiérarchiques
+        if current.left != None:
+            q.enqueue((current.left, 2 * idx))
+        if current.right != None:
+            q.enqueue((current.right, 2 * idx + 1))
+            
+    return res
+
+
+def count_leaves(B):
+    if B == None:
+        return 0
+    
+    if B.left == None and B.right == None:
+        return 1
+    
+    return count_leaves(B.left) + count_leaves(B.right)
+
+def sum_tree(B):
+    if  B == None:
+        return 0
+    else:
+        return B.key + sum_tree(B.left) + sum_tree(B.right)
+        
+def check_sum(B):
+    if B == None:
+        return True
+    
+    if B.left != None and B.right != None:
+        cond= (B.key == B.left.key + B.right.key)
+    else:
+        # Si c'est une feuille ou un point simple, il n'y a pas de violation
+        cond = True
+        
+    # 2. Grâce au "and", si condition_ici est False, 
+    # la machine s'arrête direct (court-circuit) et renvoie False.
+    return cond and check_sum(B.left) and check_sum(B.right)
+
+
+'''Écrire la fonction get_first_single(B) qui retourne laclé du premier point simple rencontré dans l arbre
+binaire B et -1 si B ne contient pas de point simple (l arbre binaire B ne contient que des entiers positifs).Le
+parcours profondeur doit obligatoirement être utilisé.'''
+
+def get_first_single(B):
+    if B == None:
+        return -1 
+    else:
+        if B.left == None:
+            if B.right != None:
+                return B.key
+        elif B.left != None:
+            if B.right == None:
+                return B.key
+        # 2. Si on arrive ici, c'est un point double. On explore d'abord à gauche.
+        res_left = get_first_single(B.left)
+        if res_left != -1:
+            return res_left # Court-circuit immédiat ! Trouvé à gauche, on ne va pas à droite.
+            
+        # 3. Si rien n'a été trouvé à gauche, on renvoie le résultat de droite
+        return get_first_single(B.right)
+
+'''Écrire la fonction get_first_heavy_double(B) qui renvoie la clé du premier point double (un nœud avec 2 enfants) 
+rencontré lors d'un parcours en profondeur (DFS, fils gauche d'abord) dont la clé est strictement supérieure à la 
+somme des clés de ses deux fils directs. 
+Si aucun nœud ne respecte cette condition ou s'il n'y a pas de point double, la fonction doit renvoyer -1'''
+
+def get_first_heavy_double(B):
+    if B == None:
+        return -1
+    else:
+        if B.left != None:
+            if B.right != None:
+                children = B.left.key + B.right.key
+                if B.key > children:
+                    return B.key
+        
+        res_left = get_first_heavy_double(B.left)
+        if res_left != -1:
+            return res_left
+        
+        return get_first_heavy_double(B.right)
+        
+
+def is_all_leaves_even(B):
+    if B == None:
+        return True 
+    else:
+        if B.left == None and B.right == None:
+            return B.key % 2 == 0
+        else:
+            res_g = is_all_leaves_even(B.left)
+            if res_g:
+                return is_all_leaves_even(B.right)
+            else:
+                return False
+            
+
+def are_structures_identical(B1, B2):
+    if B1 == None and B2 == None:
+        return True 
+    elif B1 == None and B2 != None:
+        return False
+    elif B1 != None and B2 == None:
+        return False
+    else:
+        res_g = are_structures_identical(B1.left, B2.left)
+
+        if res_g:
+            return are_structures_identical(B1.right, B2.right)
+        else:
+            return False
+        
+
+def is_sub_value_tree(B1, B2):
+    if B1 == None and B2 == None:
+        return True
+    else:
+        if B1.key > B2.key:
+            return False
+        else:
+            resg = is_sub_value_tree(B1.left,B2.left)
+
+            if resg:
+                return is_sub_value_tree(B1.right,B2.right)
+            else:
+                return False
+            
+
+def is_double_mirror_value(B1, B2):
+    if B1 == None and B2 == None:
+        return True
+    else:
+  
+        if B1.key % 2 == 0:
+            if B1.key <= B2.key: 
+                return False
+        else: 
+            if B1.key >= B2.key: 
+                return False
+            
+        resg = is_double_mirror_value(B1.left, B2.left)
+        if resg:
+            return is_double_mirror_value(B1.right, B2.right)
+        else:
+            return False
+    
+
+def is_symmetric(B):
+    if B == None:
+        return True
+    else:
+        # On lance la vérification en miroir entre le côté gauche et le côté droit
+        return help(B.left, B.right)
+
+def help(B1, B2):
+    if B1 == None and B2 == None:
+        return True
+    elif B1 == None and B2 != None:
+        return False
+    elif B1 != None and B2 == None:
+        return False
+    else:
+        # 1. TEST LOCAL : Même clé ?
+        if B1.key != B2.key:
+            return False
+        else:
+            # 2. RECHERCHE EN MIROIR ET COURT-CIRCUIT
+            # Premier croisement : Gauche de B1 avec Droite de B2
+            res = help(B1.left, B2.right)
+            
+            if res:
+                # Deuxième croisement : Droite de B1 avec Gauche de B2
+                return help(B1.right, B2.left)
+            else:
+                return False
+            
+
+def are_trees_mirrors(B1,B2):
+    if B1 == None and B2 == None:
+        return True
+    elif B1 == None and B2 != None:
+        return False
+    elif B1 != None and B2 == None:
+        return False
+    else:
+        if B1.key != B2.key:
+            return False
+        else:
+            res = are_trees_mirrors(B1.left,B2.right)
+            if res:
+                return are_trees_mirrors(B1.right,B2.left)
+            else:
+                return False
+
+
+
+def aux(B,x,num):
+    if B == None:
+        return None
+    else:
+        if B.key == x:
+            return num
+        else:
+            res_g = aux(B.left,x,2*num)
+
+            if res_g != None:
+                return res_g
+            
+            else:
+                return aux(B.right,x,2*num+1)
+            
+def search_hier(B,x):
+    return aux(B,x,1)
+
+
+def help(B, x, acc):
+    if B == None:
+        return None
+    else:
+        if B.key == x:
+            return acc * B.key
+        else:
+            resg = help(B.left, x, acc * B.key)
+            if resg != None:
+                return resg
+            else:
+                return help(B.right, x, acc * B.key)
+
+def find_level_product(B, x):
+    if B == None:
+        return None
+    else:
+        return help(B, x, 1)
+
+#explication IA : 
+def replace_single_by_child_sum(B):
+    if B == None:
+        return None
+    else:
+        # 1. TRAITEMENT SUFFIXE : On transforme d'abord les sous-arbres
+        new_left = replace_single_by_child_sum(B.left)
+        new_right = replace_single_by_child_sum(B.right)
+        
+        # 2. TEST LOCAL : On analyse la structure pour reconstruire le nœud
+        if new_left == None:
+            if new_right == None:
+                # Cas A : Feuille (0 fils) -> On garde la clé d'origine
+                return BinTree(B.key, None, None)
+            else:
+                # Cas B : Point simple avec fils DROIT unique -> Clé du fils droit
+                return BinTree(new_right.key, None, new_right)
+        else:
+            if new_right == None:
+                # Cas C : Point simple avec fils GAUCHE unique -> Clé du fils gauche
+                return BinTree(new_left.key, new_left, None)
+            else:
+                # Cas D : Le nœud a 2 fils -> On garde la clé d'origine
+                return BinTree(B.key, new_left, new_right)
+
+def find_max_by_level(B):
+    if B == None:
+        return []
+    else:
+        q = Queue()
+        q.enqueue(B)
+        
+        res = []
+        while not q.isempty():
+            qnxt = Queue()
+            max = 0
+            while not q.isempty():
+                x = q.dequeue()
+                if x.key > max:
+                    max = x.key
+                
+                if x.left != None:
+                    qnxt.enqueue(x.left)
+                if x.right != None:
+                    qnxt.enqueue(x.right)
+
+            res.append(max)   
+            q = qnxt
+        
+        return res 
+                
+
+def has_path_with_sum(B,target):
+    if B == None:
+        return False
+    else:
+        if B.left == None:
+            if B.right == None:
+                if B.key == target:
+                    return True
+                else:
+                    return False
+            else:
+                # Point simple droit (pas de fils gauche)
+                return has_path_with_sum(B.right, target - B.key)
+        else:
+            # 2. CAS DU POINT SIMPLE GAUCHE (pas de fils droit)
+            if B.right == None:
+                return has_path_with_sum(B.left, target - B.key)
+            else:
+                # 3. CAS DU NŒUD COMPLET (2 fils) -> COURT-CIRCUIT STRICT
+                res_g = has_path_with_sum(B.left, target - B.key)
+                
+                if res_g == True: 
+                    return True
+                else:     
+                    return has_path_with_sum(B.right, target - B.key)
+
+def is_perfectly_full(B):
+    if B == None:
+        return True
+    else:
+        q = Queue()
+        q.enqueue(B)
+        ex = 1
+
+        while not q.isempty():
+            t_lvl = len(q)
+            qnxt = Queue()
+            while not q.isempty():
+                x = q.dequeue()
+                if x.left != None:
+                    qnxt.enqueue(x.left)
+                if x.right != None:
+                    qnxt.enqueue(x.right)
+            
+            if t_lvl != ex:
+                if not qnxt.isempty():
+                    return False
+            ex*=2
+            q = qnxt
+
+        return True 
+
+def count_occurrences_by_level(B, target):
+    if B == None:
+        return []
+    else:
+        q = Queue()
+        q.enqueue(B)
+        res = []
+        while not q.isempty():
+            qnxt = Queue()
+            c = 0
+            while not q.isempty():
+                x = q.dequeue()
+                if x.key == target:
+                    c+=1 
+                if x.left != None:
+                    qnxt.enqueue(x.left)
+                if x.right != None:
+                    qnxt.enqueue(x.right)
+            
+            res.append(c)
+            q = qnxt
+        return res
+
+def find_level_with_max_nodes(B):
+    if B == None:
+        return -1
+    else:
+        q = Queue()
+        q.enqueue(B)
+        curr_lvl = 0   
+        best_lvl = 0   
+        max_nodes = 0
+
+        while not q.isempty():
+            qnxt = Queue()
+            node_lvl = 0
+            
+            while not q.isempty():
+                x = q.dequeue()
+                node_lvl +=1 
+                
+                if x.left != None:
+                    qnxt.enqueue(x.left)
+                if x.right != None:
+                    qnxt.enqueue(x.right)
+                
+            if node_lvl > max_nodes:
+                max_nodes = node_lvl
+                best_lvl = curr_lvl
+            
+            q = qnxt
+            curr_lvl += 1
+            
+        return best_lvl
+
+
+        
+        
